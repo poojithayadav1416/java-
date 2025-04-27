@@ -1,0 +1,21 @@
+import java.util.*;
+public class Main
+{
+	public static void main(String[] args) {
+	    String s1="pothula";
+	    String s2="poojitha";
+	    String s3=s1+" "+s2;
+	    
+	    
+	    
+	   
+	        
+	   
+	    
+		System.out.println(s3);
+	    
+		
+	
+
+	}
+}
