@@ -1,0 +1,115 @@
+rg.example;
+
+
+import java.sql.*;
+
+public class Main {
+    static final String URL = "jdbc:mysql://localhost:3306/poojitha";
+    static final String USER = "root";
+    static final String PASSWORD = "Poojitha@1729";
+
+    // 1. Insert 10 students
+    public static void createStudents() {
+        String[] names = {"Alice", "Bob", "Charlie", "David", "Eva", "Frank", "Grace", "Helen", "Ivy", "Jack"};
+        int[] ages = {18, 19, 20, 18, 21, 22, 20, 19, 18, 21};
+        int[] marks = {25, 15, 35, 10, 50, 29, 18, 22, 28, 32};
+
+        try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD)) {
+            String query = "INSERT INTO students (name, age, marks,id) VALUES (?, ?, ?,?)";
+            PreparedStatement ps = con.prepareStatement(query);
+
+            for (int i = 0; i < 10; i++) {
+                ps.setString(1, names[i]);
+                ps.setInt(2, ages[i]);
+                ps.setInt(3, marks[i]);
+                ps.setInt(4, i+1);
+                ps.executeUpdate();
+            }
+            System.out.println("Inserted 10 students successfully.");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 2. Get all students
+    public static void getAll() {
+        try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD)) {
+            ResultSet rs = con.createStatement().executeQuery("SELECT * FROM students");
+            while (rs.next()) {
+                System.out.println(rs.getInt("id") + " | " + rs.getString("name") +
+                        " | " + rs.getInt("age") + " | " + rs.getInt("marks"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 3. Get by name
+    public static void getByName(String name) {
+        try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD)) {
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM students WHERE name = ?");
+            ps.setString(1, name);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                System.out.println(rs.getInt("id") + " | " + rs.getString("name") +
+                        " | " + rs.getInt("age") + " | " + rs.getInt("marks"));
+            } else {
+                System.out.println("No student found with name: " + name);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 4. Get students with marks > 20
+    public static void getMarksGreaterThan(int marks) {
+        try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD)) {
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM students WHERE marks > ?");
+            ps.setInt(1, marks);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                System.out.println(rs.getString("name") + " | Marks: " + rs.getInt("marks"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 5. Edit student by name
+    public static void editByName(String name, int newAge, int newMarks) {
+        try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD)) {
+            PreparedStatement ps = con.prepareStatement("UPDATE students SET age = ?, marks = ? WHERE name = ?");
+            ps.setInt(1, newAge);
+            ps.setInt(2, newMarks);
+            ps.setString(3, name);
+            int rows = ps.executeUpdate();
+            System.out.println(rows > 0 ? "Updated successfully." : "Student not found.");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 6. Delete student by name
+    public static void deleteByName(String name) {
+        try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD)) {
+            PreparedStatement ps = con.prepareStatement("DELETE FROM students WHERE name = ?");
+            ps.setString(1, name);
+            int rows = ps.executeUpdate();
+            System.out.println(rows > 0 ? "Deleted successfully." : "Student not found.");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 🔄 Main method to test
+    public static void main(String[] args) {
+
+         createStudents();
+         getAll();
+        // getByName("Charlie");
+        // getMarksGreaterThan(20);
+        // editByName("Bob", 21, 45);
+        // deleteByName("David");
+    }
+}
+
